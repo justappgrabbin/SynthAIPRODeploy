@@ -1,0 +1,30 @@
+services:
+  synthai:
+    build:
+      context: .
+    container_name: synthai-all-in-one
+    restart: unless-stopped
+    ports:
+      - "${SYNTHAI_PORT:-8080}:10000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      NODE_ENV: production
+      NODE_MODE: full
+      PORT: 10000
+      FRONTEND_DIST: /app/frontend-dist
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      TRIDENT_ONNX_ENABLED: ${TRIDENT_ONNX_ENABLED:-false}
+      TERMINAL_TOKEN: ${TERMINAL_TOKEN:-}
+      SUPABASE_PRIMARY_URL: ${SUPABASE_PRIMARY_URL:-https://leisphnjslcuepflefri.supabase.co}
+      SUPABASE_PRIMARY_KEY: ${SUPABASE_PRIMARY_KEY:-sb_publishable_r875ycY951IHyew2SwXEmg_qMOgv9AW}
+      SUPABASE_SECONDARY_URL: ${SUPABASE_SECONDARY_URL:-}
+      SUPABASE_SECONDARY_KEY: ${SUPABASE_SECONDARY_KEY:-}
+      SUPABASE_APP_BUCKET: ${SUPABASE_APP_BUCKET:-synthia-apps}
+      HUGGINGFACE_NAMESPACE: ${HUGGINGFACE_NAMESPACE:-stellarproximology}
+      HF_TOKEN: ${HF_TOKEN:-}
+      TRIDENT_HF_REPO: ${TRIDENT_HF_REPO:-stellarproximology/Trident}
+      HF_REPO_ID: ${HF_REPO_ID:-stellarproximology/Trident}
+      TRIDENT_MODEL_URL: ${TRIDENT_MODEL_URL:-}
+      APP_RUNNER_TIMEOUT_MS: ${APP_RUNNER_TIMEOUT_MS:-120000}
+      APP_RUNNER_MAX_OUTPUT: ${APP_RUNNER_MAX_OUTPUT:-120000}
