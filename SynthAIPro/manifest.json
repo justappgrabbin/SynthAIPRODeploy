@@ -1,0 +1,84 @@
+{
+  "name": "SYNTHAI 🪷 - Your Personal AI Agent",
+  "short_name": "SYNTHAI",
+  "description": "SYNTHAI 🪷 - Your personal AI agent that tracks your projects, follows up on commitments, and keeps things moving while you focus on the work.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937",
+  "categories": ["productivity", "lifestyle"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%231f2937' width='540' height='720'/><text x='270' y='360' font-size='48' fill='%23fff' text-anchor='middle' dominant-baseline='middle'>Meli</text></svg>",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'><rect fill='%231f2937' width='1280' height='720'/><text x='640' y='360' font-size='48' fill='%23fff' text-anchor='middle' dominant-baseline='middle'>Meli</text></svg>",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%233b82f6;stop-opacity:1' /><stop offset='100%' style='stop-color:%231e40af;stop-opacity:1' /></linearGradient></defs><rect fill='url(%23grad)' width='192' height='192' rx='45'/><circle cx='96' cy='70' r='28' fill='%23fbbf24'/><path d='M 96 100 Q 70 120 60 140 L 132 140 Q 122 120 96 100' fill='%23ffffff' opacity='0.9'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%233b82f6;stop-opacity:1' /><stop offset='100%' style='stop-color:%231e40af;stop-opacity:1' /></linearGradient></defs><rect fill='url(%23grad)' width='192' height='192' rx='45'/><circle cx='96' cy='70' r='28' fill='%23fbbf24'/><path d='M 96 100 Q 70 120 60 140 L 132 140 Q 122 120 96 100' fill='%23ffffff' opacity='0.9'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%233b82f6;stop-opacity:1' /><stop offset='100%' style='stop-color:%231e40af;stop-opacity:1' /></linearGradient></defs><rect fill='url(%23grad)' width='512' height='512' rx='120'/><circle cx='256' cy='180' r='75' fill='%23fbbf24'/><path d='M 256 280 Q 180 340 150 400 L 362 400 Q 332 340 256 280' fill='%23ffffff' opacity='0.9'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Chat with SYNTHAI",
+      "short_name": "Chat",
+      "description": "Start a new conversation with your SYNTHAI 🪷 agent",
+      "url": "/chat",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%233b82f6' width='96' height='96' rx='20'/><path d='M 24 32 L 72 32 Q 76 32 76 36 L 76 56 Q 76 60 72 60 L 36 60 L 28 68 L 32 60 L 28 60 Q 24 60 24 56 L 24 36 Q 24 32 28 32' fill='%23ffffff'/></svg>",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "View Projects",
+      "short_name": "Projects",
+      "description": "View your projects and commitments with SYNTHAI 🪷",
+      "url": "/projects",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%3810b981' width='96' height='96' rx='20'/><rect x='24' y='24' width='48' height='48' rx='4' fill='%23ffffff' stroke='%23ffffff' stroke-width='2'/><circle cx='40' cy='40' r='4' fill='%2310b981'/><circle cx='56' cy='40' r='4' fill='%2310b981'/><circle cx='40' cy='56' r='4' fill='%2310b981'/><circle cx='56' cy='56' r='4' fill='%2310b981'/></svg>",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

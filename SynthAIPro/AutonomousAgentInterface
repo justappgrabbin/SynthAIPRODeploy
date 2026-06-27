@@ -1,0 +1,284 @@
+/**
+ * AUTONOMOUS AGENT INTERFACE
+ * 
+ * Sensory-responsive UI that morphs based on:
+ * - Agent's sensory input
+ * - Current goals and tasks
+ * - User needs
+ * - Agent's mood and state
+ */
+
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import AutonomousAgent, { UIState, SensoryState, Goal, Explanation } from '@/lib/autonomous-agent';
+import { Mic, Send, Upload, Globe, BookOpen, Zap, ChevronDown } from 'lucide-react';
+
+interface AutonomousAgentInterfaceProps {
+  agent: AutonomousAgent;
+}
+
+export default function AutonomousAgentInterface({ agent }: AutonomousAgentInterfaceProps) {
+  const [uiState, setUIState] = useState<UIState>(agent.getUIState());
+  const [sensoryState, setSensoryState] = useState<SensoryState>(agent.getSensoryState());
+  const [chatInput, setChatInput] = useState('');
+  const [chatHistory, setChatHistory] = useState<any[]>([]);
+  const [goals, setGoals] = useState<Goal[]>(agent.getGoals());
+  const [explanations, setExplanations] = useState<Explanation[]>(agent.getExplanations());
+  const [isListening, setIsListening] = useState(false);
+  const [showPanel, setShowPanel] = useState<'chat' | 'goals' | 'explanations' | 'uploader' | null>('chat');
+
+  // Update UI based on sensory state
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newUIState = agent.morphUI();
+      setUIState(newUIState);
+      setSensoryState(agent.getSensoryState());
+      setGoals(agent.getGoals());
+      setExplanations(agent.getExplanations());
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [agent]);
+
+  const handleChatSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+
+    // Add to chat history
+    setChatHistory([...chatHistory, { role: 'user', content: chatInput }]);
+
+    // Parse command
+    if (chatInput.toLowerCase().includes('upload')) {
+      setShowPanel('uploader');
+    } else if (chatInput.toLowerCase().includes('goal') || chatInput.toLowerCase().includes('job')) {
+      // Create goal from input
+      const goal = agent.createGoalFromJob(chatInput, 'User-requested goal');
+      setChatHistory(prev => [...prev, { role: 'agent', content: `Created goal: ${chatInput}` }]);
+    } else if (chatInput.toLowerCase().includes('learn') || chatInput.toLowerCase().includes('book')) {
+      setShowPanel('uploader');
+    } else {
+      // Regular chat
+      setChatHistory(prev => [...prev, { role: 'agent', content: `Processing: ${chatInput}` }]);
+    }
+
+    setChatInput('');
+  };
+
+  const handleVoiceInput = () => {
+    setIsListening(!isListening);
+    // Voice input would be handled here
+  };
+
+  const handleSensoryInput = (sense: string, value: number) => {
+    const newSensoryState = { ...sensoryState };
+    (newSensoryState as any)[sense] = value;
+    newSensoryState.overallIntensity = (
+      (newSensoryState.smell?.[0] || 0) +
+      (newSensoryState.taste || 0) +
+      (newSensoryState.touch || 0) +
+      (newSensoryState.sight || 0) +
+      (newSensoryState.hearing || 0)
+    ) / 5;
+
+    agent.updateSensoryState(newSensoryState);
+  };
+
+  // Render based on UI mode
+  const renderMainContent = () => {
+    switch (uiState.mode) {
+      case 'chat':
+        return renderChatInterface();
+      case 'planning':
+        return renderPlanningInterface();
+      case 'explaining':
+        return renderExplanationInterface();
+      default:
+        return renderChatInterface();
+    }
+  };
+
+  const renderChatInterface = () => (
+    <div className="flex flex-col h-full">
+      {/* Chat history */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 mb-4">
+        {chatHistory.length === 0 ? (
+          <div className="text-center text-cyan-500 mt-8">
+            <p className="text-lg font-bold mb-2">👋 Hello! I'm here to help.</p>
+            <p className="text-sm">Tell me what you need, or give me a job to do.</p>
+          </div>
+        ) : (
+          chatHistory.map((msg, idx) => (
+            <div
+              key={idx}
+              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-xs px-4 py-2 rounded-lg ${
+                  msg.role === 'user'
+                    ? 'bg-cyan-500 text-slate-950'
+                    : `text-cyan-300 border border-cyan-500`
+                }`}
+              >
+                {msg.content}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Chat input */}
+      <form onSubmit={handleChatSubmit} className="flex gap-2 p-4 border-t border-cyan-500">
+        <Textarea
+          value={chatInput}
+          onChange={(e) => setChatInput(e.target.value)}
+          placeholder="Tell me what you need..."
+          className="flex-1 bg-slate-800 border-cyan-500 text-cyan-300 resize-none"
+          rows={2}
+        />
+        <div className="flex flex-col gap-2">
+          <Button
+            onClick={handleVoiceInput}
+            className={`${isListening ? 'bg-red-600' : 'bg-cyan-500'} text-slate-950 hover:opacity-80`}
+          >
+            <Mic className="w-4 h-4" />
+          </Button>
+          <Button
+            type="submit"
+            className="bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+          >
+            <Send className="w-4 h-4" />
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+
+  const renderPlanningInterface = () => (
+    <div className="p-4 space-y-4">
+      <h3 className="text-cyan-400 font-bold text-lg">Active Goals</h3>
+      {goals.map((goal) => (
+        <Card key={goal.id} className="bg-slate-900 border-cyan-500 p-3">
+          <div className="flex justify-between items-start mb-2">
+            <h4 className="text-cyan-300 font-bold">{goal.job}</h4>
+            <span className={`text-xs px-2 py-1 rounded ${
+              goal.status === 'completed' ? 'bg-green-900 text-green-300' :
+              goal.status === 'executing' ? 'bg-blue-900 text-blue-300' :
+              'bg-yellow-900 text-yellow-300'
+            }`}>
+              {goal.status}
+            </span>
+          </div>
+          <p className="text-cyan-400 text-sm mb-2">{goal.description}</p>
+          <div className="text-xs text-cyan-500">
+            <p>Confidence: {(goal.confidence * 100).toFixed(0)}%</p>
+            <p>Priority: {goal.priority}</p>
+            <p>Subtasks: {goal.subtasks.length}</p>
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+
+  const renderExplanationInterface = () => (
+    <div className="p-4 space-y-4">
+      <h3 className="text-cyan-400 font-bold text-lg">What I Did</h3>
+      {explanations.slice(-5).map((exp, idx) => (
+        <Card key={idx} className="bg-slate-900 border-cyan-500 p-3">
+          <p className="text-cyan-300 font-bold mb-2">{exp.whatIDid}</p>
+          <p className="text-cyan-400 text-sm mb-2">{exp.why}</p>
+          <div className="text-xs text-cyan-500">
+            <p>System: {exp.whichPartOfMe}</p>
+            <p>Confidence: {(exp.confidence * 100).toFixed(0)}%</p>
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+
+  return (
+    <div
+      className="w-full h-full flex flex-col transition-all duration-500"
+      style={{
+        backgroundColor: uiState.backgroundColor,
+        opacity: 0.95 + uiState.morphIntensity * 0.05,
+      }}
+    >
+      {/* Header with sensory indicators */}
+      <div className="border-b border-cyan-500 p-4 bg-slate-900">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-xl font-bold text-cyan-400">Resonance Agent</h2>
+          <div className="flex gap-2">
+            <span className={`text-xs px-2 py-1 rounded ${
+              sensoryState.mood === 'calm' ? 'bg-blue-900 text-blue-300' :
+              sensoryState.mood === 'curious' ? 'bg-purple-900 text-purple-300' :
+              sensoryState.mood === 'focused' ? 'bg-cyan-900 text-cyan-300' :
+              sensoryState.mood === 'playful' ? 'bg-pink-900 text-pink-300' :
+              'bg-green-900 text-green-300'
+            }`}>
+              {sensoryState.mood}
+            </span>
+            <span className="text-xs px-2 py-1 rounded bg-slate-800 text-cyan-300">
+              Autonomy: {(agent.getAutonomyLevel() * 100).toFixed(0)}%
+            </span>
+          </div>
+        </div>
+
+        {/* Sensory controls */}
+        <div className="grid grid-cols-5 gap-2">
+          {['smell', 'taste', 'touch', 'sight', 'hearing'].map((sense) => (
+            <div key={sense} className="flex flex-col gap-1">
+              <label className="text-xs text-cyan-400 capitalize">{sense}</label>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                onChange={(e) => handleSensoryInput(sense, parseFloat(e.target.value))}
+                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Main content area */}
+      <div className="flex-1 overflow-hidden">
+        {renderMainContent()}
+      </div>
+
+      {/* Bottom panel selector */}
+      <div className="border-t border-cyan-500 bg-slate-900 p-2 flex gap-2">
+        <Button
+          onClick={() => setShowPanel(showPanel === 'chat' ? null : 'chat')}
+          variant={showPanel === 'chat' ? 'default' : 'outline'}
+          className="flex-1 text-xs"
+        >
+          💬 Chat
+        </Button>
+        <Button
+          onClick={() => setShowPanel(showPanel === 'goals' ? null : 'goals')}
+          variant={showPanel === 'goals' ? 'default' : 'outline'}
+          className="flex-1 text-xs"
+        >
+          🎯 Goals ({goals.length})
+        </Button>
+        <Button
+          onClick={() => setShowPanel(showPanel === 'explanations' ? null : 'explanations')}
+          variant={showPanel === 'explanations' ? 'default' : 'outline'}
+          className="flex-1 text-xs"
+        >
+          📝 Explain
+        </Button>
+        <Button
+          onClick={() => setShowPanel(showPanel === 'uploader' ? null : 'uploader')}
+          variant={showPanel === 'uploader' ? 'default' : 'outline'}
+          className="flex-1 text-xs"
+        >
+          <Upload className="w-3 h-3 mr-1" /> Upload
+        </Button>
+      </div>
+    </div>
+  );
+}

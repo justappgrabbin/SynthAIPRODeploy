@@ -1,0 +1,352 @@
+/**
+ * META-ORCHESTRATOR PANEL
+ * 
+ * UI for uploading code pieces, managing agents, building worlds,
+ * and orchestrating the entire system.
+ */
+
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import MetaOrchestrator, { CodePiece, Agent, EmbodiedWorld, DecisionContext } from '@/lib/meta-orchestrator';
+import { ChevronLeft, Upload, Users, Globe, Zap } from 'lucide-react';
+
+interface MetaOrchestratorPanelProps {
+  metaOrchestrator: MetaOrchestrator;
+  onBack: () => void;
+}
+
+export default function MetaOrchestratorPanel({ metaOrchestrator, onBack }: MetaOrchestratorPanelProps) {
+  const [activeTab, setActiveTab] = useState<'upload' | 'agents' | 'worlds' | 'tasks' | 'decisions'>('upload');
+  const [codeName, setCodeName] = useState('');
+  const [codeContent, setCodeContent] = useState('');
+  const [codeType, setCodeType] = useState<'function' | 'class' | 'module' | 'config' | 'data'>('function');
+  const [codeLanguage, setCodeLanguage] = useState<'typescript' | 'python' | 'javascript'>('typescript');
+  const [gate, setGate] = useState('');
+  const [line, setLine] = useState('');
+  const [worldName, setWorldName] = useState('');
+  const [worldDescription, setWorldDescription] = useState('');
+  const [bookContent, setBookContent] = useState('');
+  const [bookTitle, setBookTitle] = useState('');
+
+  const agents = metaOrchestrator.getAgents();
+  const worlds = metaOrchestrator.getWorlds();
+  const tasks = metaOrchestrator.getTasks();
+  const decisions = metaOrchestrator.getDecisionLog();
+
+  const handleUploadCode = () => {
+    if (!codeName || !codeContent) return;
+
+    const piece: CodePiece = {
+      id: `piece-${Date.now()}`,
+      name: codeName,
+      code: codeContent,
+      type: codeType,
+      language: codeLanguage,
+      gate: gate ? parseInt(gate) : undefined,
+      line: line ? parseInt(line) : undefined,
+    };
+
+    metaOrchestrator.addCodePiece(piece);
+    
+    setCodeName('');
+    setCodeContent('');
+    setGate('');
+    setLine('');
+  };
+
+  const handleBuildWorld = () => {
+    if (!worldName) return;
+    metaOrchestrator.buildWorld(worldName, worldDescription);
+    setWorldName('');
+    setWorldDescription('');
+  };
+
+  const handleLearnBook = async () => {
+    if (!bookContent || !bookTitle) return;
+    await metaOrchestrator.learnFromBook(bookContent, bookTitle);
+    setBookContent('');
+    setBookTitle('');
+  };
+
+  const handleOrchestrate = () => {
+    const result = metaOrchestrator.orchestrate();
+    console.log('Orchestration result:', result);
+  };
+
+  return (
+    <div className="w-full h-full bg-slate-950 text-cyan-300 overflow-auto">
+      {/* Header with back button */}
+      <div className="sticky top-0 bg-slate-900 border-b border-cyan-500 p-4 flex items-center justify-between">
+        <Button
+          onClick={onBack}
+          variant="outline"
+          className="border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-slate-950"
+        >
+          <ChevronLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
+        <h2 className="text-xl font-bold text-cyan-400">Meta-Orchestrator</h2>
+        <Button
+          onClick={handleOrchestrate}
+          className="bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+        >
+          <Zap className="w-4 h-4 mr-2" />
+          Orchestrate
+        </Button>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-cyan-500 p-4 bg-slate-900">
+        {(['upload', 'agents', 'worlds', 'tasks', 'decisions'] as const).map((tab) => (
+          <Button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            variant={activeTab === tab ? 'default' : 'outline'}
+            className={`capitalize ${
+              activeTab === tab
+                ? 'bg-cyan-500 text-slate-950'
+                : 'border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-slate-950'
+            }`}
+          >
+            {tab === 'upload' && <Upload className="w-4 h-4 mr-2" />}
+            {tab === 'agents' && <Users className="w-4 h-4 mr-2" />}
+            {tab === 'worlds' && <Globe className="w-4 h-4 mr-2" />}
+            {tab}
+          </Button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="p-4 space-y-4">
+        {/* Upload Code Tab */}
+        {activeTab === 'upload' && (
+          <div className="space-y-4">
+            <Card className="bg-slate-900 border-cyan-500 p-4">
+              <h3 className="text-cyan-400 font-bold mb-3">Upload Code Piece</h3>
+              
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Code piece name"
+                  value={codeName}
+                  onChange={(e) => setCodeName(e.target.value)}
+                  className="w-full bg-slate-800 border border-cyan-500 text-cyan-300 px-3 py-2 rounded"
+                />
+                
+                <select
+                  value={codeType}
+                  onChange={(e) => setCodeType(e.target.value as any)}
+                  className="w-full bg-slate-800 border border-cyan-500 text-cyan-300 px-3 py-2 rounded"
+                >
+                  <option>function</option>
+                  <option>class</option>
+                  <option>module</option>
+                  <option>config</option>
+                  <option>data</option>
+                </select>
+
+                <select
+                  value={codeLanguage}
+                  onChange={(e) => setCodeLanguage(e.target.value as any)}
+                  className="w-full bg-slate-800 border border-cyan-500 text-cyan-300 px-3 py-2 rounded"
+                >
+                  <option>typescript</option>
+                  <option>python</option>
+                  <option>javascript</option>
+                </select>
+
+                <Textarea
+                  placeholder="Paste your code here"
+                  value={codeContent}
+                  onChange={(e) => setCodeContent(e.target.value)}
+                  className="w-full bg-slate-800 border border-cyan-500 text-cyan-300 px-3 py-2 rounded font-mono text-sm h-40"
+                />
+
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="number"
+                    placeholder="Gate (1-64)"
+                    value={gate}
+                    onChange={(e) => setGate(e.target.value)}
+                    className="bg-slate-800 border border-cyan-500 text-cyan-300 px-3 py-2 rounded"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Line (1-6)"
+                    value={line}
+                    onChange={(e) => setLine(e.target.value)}
+                    className="bg-slate-800 border border-cyan-500 text-cyan-300 px-3 py-2 rounded"
+                  />
+                </div>
+
+                <Button
+                  onClick={handleUploadCode}
+                  className="w-full bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+                >
+                  Upload Code Piece
+                </Button>
+              </div>
+            </Card>
+
+            <Card className="bg-slate-900 border-cyan-500 p-4">
+              <h3 className="text-cyan-400 font-bold mb-3">Learn from Book</h3>
+              
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Book title"
+                  value={bookTitle}
+                  onChange={(e) => setBookTitle(e.target.value)}
+                  className="w-full bg-slate-800 border border-cyan-500 text-cyan-300 px-3 py-2 rounded"
+                />
+                
+                <Textarea
+                  placeholder="Paste book content or summary"
+                  value={bookContent}
+                  onChange={(e) => setBookContent(e.target.value)}
+                  className="w-full bg-slate-800 border border-cyan-500 text-cyan-300 px-3 py-2 rounded font-mono text-sm h-40"
+                />
+
+                <Button
+                  onClick={handleLearnBook}
+                  className="w-full bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+                >
+                  Learn from Book
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Agents Tab */}
+        {activeTab === 'agents' && (
+          <div className="space-y-3">
+            <h3 className="text-cyan-400 font-bold">Resonant Agents ({agents.length})</h3>
+            {agents.map((agent) => (
+              <Card key={agent.id} className="bg-slate-900 border-cyan-500 p-3">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h4 className="text-cyan-300 font-bold">{agent.name}</h4>
+                    <p className="text-cyan-500 text-sm">Gate {agent.design.gate} • Line {agent.design.line}</p>
+                  </div>
+                  <span className={`text-xs px-2 py-1 rounded ${
+                    agent.status === 'active' ? 'bg-green-900 text-green-300' :
+                    agent.status === 'training' ? 'bg-yellow-900 text-yellow-300' :
+                    'bg-slate-800 text-slate-400'
+                  }`}>
+                    {agent.status}
+                  </span>
+                </div>
+                <p className="text-cyan-400 text-sm mb-2">{agent.purpose}</p>
+                <div className="text-xs text-cyan-500">
+                  <p>Skills: {agent.skills.join(', ')}</p>
+                  <p>Confidence: {(agent.confidence * 100).toFixed(0)}%</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Worlds Tab */}
+        {activeTab === 'worlds' && (
+          <div className="space-y-4">
+            <Card className="bg-slate-900 border-cyan-500 p-4">
+              <h3 className="text-cyan-400 font-bold mb-3">Build Embodied World</h3>
+              
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="World name"
+                  value={worldName}
+                  onChange={(e) => setWorldName(e.target.value)}
+                  className="w-full bg-slate-800 border border-cyan-500 text-cyan-300 px-3 py-2 rounded"
+                />
+                
+                <Textarea
+                  placeholder="World description"
+                  value={worldDescription}
+                  onChange={(e) => setWorldDescription(e.target.value)}
+                  className="w-full bg-slate-800 border border-cyan-500 text-cyan-300 px-3 py-2 rounded h-24"
+                />
+
+                <Button
+                  onClick={handleBuildWorld}
+                  className="w-full bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+                >
+                  Build World
+                </Button>
+              </div>
+            </Card>
+
+            <div className="space-y-3">
+              <h3 className="text-cyan-400 font-bold">Existing Worlds ({worlds.length})</h3>
+              {worlds.map((world) => (
+                <Card key={world.id} className="bg-slate-900 border-cyan-500 p-3">
+                  <h4 className="text-cyan-300 font-bold">{world.name}</h4>
+                  <p className="text-cyan-500 text-sm mb-2">{world.description}</p>
+                  <p className="text-cyan-400 text-xs">Agents: {world.agents.length} • Coherence: {(world.coherence * 100).toFixed(0)}%</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tasks Tab */}
+        {activeTab === 'tasks' && (
+          <div className="space-y-3">
+            <h3 className="text-cyan-400 font-bold">Delegated Tasks ({tasks.length})</h3>
+            {tasks.length === 0 ? (
+              <p className="text-cyan-500 text-sm">No tasks yet. Upload code or build worlds to generate tasks.</p>
+            ) : (
+              tasks.map((task) => (
+                <Card key={task.id} className="bg-slate-900 border-cyan-500 p-3">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="text-cyan-300 font-bold">{task.goal}</h4>
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      task.status === 'completed' ? 'bg-green-900 text-green-300' :
+                      task.status === 'delegated' ? 'bg-blue-900 text-blue-300' :
+                      'bg-slate-800 text-slate-400'
+                    }`}>
+                      {task.status}
+                    </span>
+                  </div>
+                  <p className="text-cyan-400 text-sm">Confidence: {(task.confidence * 100).toFixed(0)}%</p>
+                  {task.assignedAgent && <p className="text-cyan-500 text-xs">Agent: {task.assignedAgent}</p>}
+                </Card>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* Decisions Tab */}
+        {activeTab === 'decisions' && (
+          <div className="space-y-3">
+            <h3 className="text-cyan-400 font-bold">Decision Log ({decisions.length})</h3>
+            {decisions.length === 0 ? (
+              <p className="text-cyan-500 text-sm">No decisions yet.</p>
+            ) : (
+              decisions.map((decision, index) => (
+                <Card key={index} className="bg-slate-900 border-cyan-500 p-3">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="text-cyan-300 text-sm font-mono">{decision.query}</p>
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      decision.action === 'proceed' ? 'bg-green-900 text-green-300' :
+                      decision.action === 'question' ? 'bg-yellow-900 text-yellow-300' :
+                      'bg-orange-900 text-orange-300'
+                    }`}>
+                      {decision.action}
+                    </span>
+                  </div>
+                  <p className="text-cyan-400 text-xs">{decision.reasoning}</p>
+                  <p className="text-cyan-500 text-xs mt-1">Confidence: {(decision.confidence * 100).toFixed(0)}%</p>
+                </Card>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

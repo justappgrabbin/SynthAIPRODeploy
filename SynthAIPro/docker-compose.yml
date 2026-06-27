@@ -1,0 +1,13 @@
+services:
+  synthaipro:
+    build:
+      context: .
+      args:
+        VITE_SYNTHIA_API_URL: ${VITE_SYNTHIA_API_URL:-}
+        VITE_SYNTHIA_WS_URL: ${VITE_SYNTHIA_WS_URL:-}
+    container_name: synthaipro
+    restart: unless-stopped
+    ports:
+      - "${SYNTHAIPRO_PORT:-8080}:10000"
+    environment:
+      PORT: 10000
