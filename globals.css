@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --aion-void: #0a0a0f;
+  --aion-matter: #1a1a2e;
+  --aion-energy: #16213e;
+  --aion-resonance: #0f3460;
+  --aion-pulse: #e94560;
+  --aion-light: #f5f5f5;
+  --aion-gold: #d4af37;
+  --aion-silver: #c0c0c0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--aion-void);
+  color: var(--aion-light);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--aion-void);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--aion-resonance);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--aion-pulse);
+}
+
+::selection {
+  background: var(--aion-pulse);
+  color: white;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.os-manifestor { --accent-color: #ff4444; --action-style: direct; }
+.os-generator { --accent-color: #44ff44; --action-style: responsive; }
+.os-mg { --accent-color: #ffaa00; --action-style: dynamic; }
+.os-projector { --accent-color: #8844ff; --action-style: inviting; }
+.os-reflector { --accent-color: #44aaff; --action-style: cyclical; }
+
+.prose pre {
+  background: var(--aion-void) !important;
+  border: 1px solid var(--aion-resonance);
+}
+
+.prose code {
+  color: var(--aion-pulse);
+  background: var(--aion-energy);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+}
