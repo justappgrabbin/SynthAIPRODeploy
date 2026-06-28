@@ -1,0 +1,26 @@
+# Runtime data
+.env
+.env.*
+data/
+uploads/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# Vite / frontend build
+SynthAIPro/dist/
+SynthAIPro/.vite/
+
+# Capacitor generated Android project
+# The workflow regenerates this from SynthAIPro/capacitor.config.json.
+SynthAIPro/android/
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
