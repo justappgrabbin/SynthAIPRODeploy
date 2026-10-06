@@ -1,4 +1,5 @@
 name: Build Android APK
+# Review branch packages the repository app without the later APK wrapper.
 
 on:
   workflow_dispatch:
