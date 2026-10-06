@@ -7,6 +7,7 @@ on:
     branches:
       - main
       - review/repo-app-apk-20261006
+      - fix/android-local-bundle-20261006
     paths:
       - 'SynthAIPro/**'
       - '.github/workflows/android-apk.yml'
