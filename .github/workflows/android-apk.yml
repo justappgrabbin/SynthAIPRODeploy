@@ -23,7 +23,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: android-actions/setup-android@v3
       - run: npm install
       - run: npm install --save-dev @capacitor/cli @capacitor/core @capacitor/android
       - run: npm run build
