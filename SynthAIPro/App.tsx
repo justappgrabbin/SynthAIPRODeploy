@@ -1,4 +1,4 @@
-mport React from "react";
+import React from "react";
 import AppRunner from "./src/components/AppRunner";
 import BootTerminal from "./src/components/BootTerminal";
 import SynthiaConnection from "./src/components/SynthiaConnection";
